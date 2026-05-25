@@ -23,3 +23,5 @@ torch
 
 tavily-python
 beautifulsoup4
+streamlit
+rich
