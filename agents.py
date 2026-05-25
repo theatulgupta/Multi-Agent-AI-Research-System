@@ -10,52 +10,33 @@ from langchain_mistralai import ChatMistralAI
 from tools import web_search, scrape_url
 
 
-# =========================================================
-# LLM
-# =========================================================
-
+# using mistral-small — fast and good enough for research tasks
 llm = ChatMistralAI(
-    name="mistralai/Mistral-7B-Instruct-v0.1",
+    model="mistral-small",
     temperature=0.2
 )
 
 parser = StrOutputParser()
 
 
-# =========================================================
-# Search Agent
-# =========================================================
-
 def build_search_agent():
-    return create_agent(
-        model=llm,
-        tools=[web_search]
-    )
+    return create_agent(model=llm, tools=[web_search])
 
-
-# =========================================================
-# Scrape Agent
-# =========================================================
 
 def build_scrape_agent():
-    return create_agent(
-        model=llm,
-        tools=[scrape_url]
-    )
+    return create_agent(model=llm, tools=[scrape_url])
 
 
-# =========================================================
-# Writer Chain
-# =========================================================
+# -----------------------------------------------------------
+# Writer: turns raw research into a structured report
+# -----------------------------------------------------------
 
 writer_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
-        """
-You are a senior research analyst and technical report writer.
+        """You are a senior research analyst and technical report writer.
 
-Your task is to create deeply researched, factually accurate,
-and professionally structured reports.
+Your task is to create deeply researched, factually accurate, and professionally structured reports.
 
 STRICT RULES:
 - Use ONLY the provided research material
@@ -75,14 +56,11 @@ WRITING STYLE:
 - Balanced and objective
 - Easy to read and logically organized
 
-Your goal is to produce publication-quality research reports.
-"""
+Your goal is to produce publication-quality research reports."""
     ),
-
     (
         "human",
-        """
-TOPIC:
+        """TOPIC:
 {topic}
 
 RESEARCH MATERIAL:
@@ -125,23 +103,21 @@ List all unique URLs or references found in the research.
 IMPORTANT:
 - Do not fabricate sources
 - Do not include unsupported claims
-- Keep the report highly informative and professional
-"""
+- Keep the report highly informative and professional"""
     )
 ])
 
 writer_chain = writer_prompt | llm | parser
 
 
-# =========================================================
-# Critic Chain
-# =========================================================
+# -----------------------------------------------------------
+# Critic: reviews the report and gives structured feedback
+# -----------------------------------------------------------
 
 critic_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
-        """
-You are a senior research reviewer and fact-checking analyst.
+        """You are a senior research reviewer and fact-checking analyst.
 
 Your job is to critically evaluate research reports with strict standards.
 
@@ -175,15 +151,11 @@ Evaluate the report using the following criteria:
 - Does the report provide meaningful insights?
 - Does it synthesize information instead of only summarizing?
 
-Be highly critical and analytical.
-Return constructive and actionable feedback.
-"""
+Be highly critical and analytical. Return constructive and actionable feedback."""
     ),
-
     (
         "human",
-        """
-TOPIC:
+        """TOPIC:
 {topic}
 
 RESEARCH GATHERED:
@@ -228,24 +200,21 @@ Choose one:
 - Major Revision
 - Reject
 
-Explain the verdict briefly.
-"""
+Explain the verdict briefly."""
     )
 ])
 
 critic_chain = critic_prompt | llm | parser
 
 
-# =========================================================
-# Revision Chain
-# =========================================================
+# -----------------------------------------------------------
+# Revision: rewrites the report based on critic feedback
+# -----------------------------------------------------------
 
 revision_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
-        """
-You are a senior editor responsible for improving
-research reports based on reviewer feedback.
+        """You are a senior editor responsible for improving research reports based on reviewer feedback.
 
 Your task:
 - Fix weaknesses identified by the critic
@@ -258,14 +227,11 @@ Your task:
 STRICT RULES:
 - Use ONLY the provided research
 - Do NOT invent information
-- Keep all improvements grounded in evidence
-"""
+- Keep all improvements grounded in evidence"""
     ),
-
     (
         "human",
-        """
-TOPIC:
+        """TOPIC:
 {topic}
 
 ORIGINAL REPORT:
@@ -279,8 +245,7 @@ CRITIC FEEDBACK:
 
 Rewrite and improve the report accordingly.
 
-Return ONLY the improved final report.
-"""
+Return ONLY the improved final report."""
     )
 ])
 
