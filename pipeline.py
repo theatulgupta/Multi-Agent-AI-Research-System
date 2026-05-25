@@ -45,7 +45,10 @@ def run_research_pipeline(topic: str) -> dict:
         )]
     })
 
-    state["search_result"] = search_response["messages"][-1].content
+    raw = search_response["messages"][-1].content
+    state["search_result"] = raw if isinstance(raw, str) else " ".join(
+        c.get("text", "") for c in raw if isinstance(c, dict) and "text" in c
+    )
     print("\nSEARCH RESULT:\n")
     print(state["search_result"])
 
@@ -66,7 +69,10 @@ def run_research_pipeline(topic: str) -> dict:
         )]
     })
 
-    state["scrape_result"] = scrape_response["messages"][-1].content
+    raw = scrape_response["messages"][-1].content
+    state["scrape_result"] = raw if isinstance(raw, str) else " ".join(
+        c.get("text", "") for c in raw if isinstance(c, dict) and "text" in c
+    )
     print("\nSCRAPE RESULT:\n")
     print(state["scrape_result"])
 
