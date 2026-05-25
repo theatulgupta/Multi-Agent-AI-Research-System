@@ -1,0 +1,6 @@
+[server]
+# prevents the torch/__path__ RuntimeError spam in the logs
+fileWatcherType = "poll"
+
+[browser]
+gatherUsageStats = false
