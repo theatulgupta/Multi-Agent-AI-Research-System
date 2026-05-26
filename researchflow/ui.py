@@ -73,9 +73,9 @@ def render_pipeline(active: int, done_up_to: int, error_at: int = -1, target=Non
     '''
     
     if target is not None:
-        target.markdown(html_content, unsafe_allow_html=True)
+        target.html(html_content)
     else:
-        st.markdown(html_content, unsafe_allow_html=True)
+        st.html(html_content)
 
 
 def render_hero() -> None:
@@ -126,10 +126,10 @@ def render_process_note(current_stage: str, target=None) -> None:
         """
 
     if target is not None:
-        target.markdown(content, unsafe_allow_html=True)
+        target.html(content)
         return
 
-    st.markdown(content, unsafe_allow_html=True)
+    st.html(content)
 
 
 def render_input_row(key: str = "topic_field") -> str:
