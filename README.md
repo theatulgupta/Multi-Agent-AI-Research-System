@@ -43,3 +43,13 @@ MISTRAL_API_KEY=<your_key>
 - Mistral AI for the language model
 - Tavily for web search
 - BeautifulSoup4 for web scraping
+
+## Deployment
+
+Deploy to Streamlit Cloud in minutes. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+**Quick Deploy:**
+1. Push to GitHub
+2. Connect at https://share.streamlit.io
+3. Add API keys in Secrets settings
+4. Deploy!
