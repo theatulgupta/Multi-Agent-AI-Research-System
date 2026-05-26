@@ -9,6 +9,7 @@ from .service import score_color
 
 
 def render_pipeline(active: int, done_up_to: int, error_at: int = -1, target=None) -> None:
+    """Render the pipeline with proper HTML (v2 - fixed)."""
     cards = []
     for i, (label, desc) in enumerate(STEPS):
         if error_at == i:
@@ -77,7 +78,7 @@ def render_hero() -> None:
             <div class="hero-grid">
                 <div>
                     <div class="hero-title">{APP_NAME}</div>
-                    <p class="hero-sub">{APP_TAGLINE}</p>
+                    <p class="hero-sub">{APP_TAGLINE} <span style="color:#22c55e;font-size:0.7rem;">[UI v2.0 - HTML FIX APPLIED]</span></p>
                 </div>
                 <div class="hero-badges">
                     <span class="hero-badge">Professional research workspace</span>
