@@ -1,14 +1,11 @@
 from langchain.tools import tool
 import requests
 import html
-import os
 from bs4 import BeautifulSoup
 from tavily import TavilyClient
-from dotenv import load_dotenv
+from researchflow.env import get_api_key
 
-load_dotenv()
-
-tavily = TavilyClient(os.getenv("TAVILY_API_KEY"))
+tavily = TavilyClient(get_api_key("TAVILY_API_KEY"))
 
 
 @tool

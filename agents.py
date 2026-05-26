@@ -1,6 +1,8 @@
-from dotenv import load_dotenv
+from researchflow.env import get_api_key
+import os
 
-load_dotenv()
+# Set API key for Mistral
+os.environ["MISTRAL_API_KEY"] = get_api_key("MISTRAL_API_KEY")
 
 from langchain.agents import create_agent
 from langchain_core.output_parsers import StrOutputParser
