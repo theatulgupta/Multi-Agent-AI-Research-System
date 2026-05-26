@@ -1,6 +1,6 @@
 [server]
-# prevents the torch/__path__ RuntimeError spam in the logs
-fileWatcherType = "poll"
+# prevents Streamlit from crawling torch/transformers and spamming startup logs
+fileWatcherType = "none"
 
 [browser]
 gatherUsageStats = false

@@ -1,18 +1,27 @@
-# Multi-Agent AI Research System
+# ResearchFlow
 
-A multi-agent pipeline that researches any topic and produces a reviewed, revised research report — fully automated.
+ResearchFlow is a dark, professional research workspace that searches sources, extracts evidence, drafts a report, reviews it, and publishes a final revision.
 
-## How it works
+## Flow
 
 ```
-User Input → Search Agent → Scrape Agent → Writer → Critic → Revision → Final Report
+Topic Brief → Search → Scrape → Draft → Review → Revise → Final Report
 ```
 
-1. **Search Agent** — uses Tavily to find recent, reliable sources
-2. **Scrape Agent** — picks the best URL and extracts full page content
-3. **Writer Chain** — drafts a structured research report from the gathered material
-4. **Critic Chain** — reviews the report for accuracy, depth, and clarity
-5. **Revision Chain** — rewrites the report based on critic feedback
+## Run
+
+```bash
+streamlit run app.py
+```
+
+## Project Structure
+
+- `app.py` - thin Streamlit entrypoint
+- `researchflow/app.py` - main UI assembly and workflow wiring
+- `researchflow/ui.py` - reusable UI components and process tracker
+- `researchflow/service.py` - pipeline execution and scoring helpers
+- `researchflow/theme.py` - shared dark theme and styling
+- `researchflow/config.py` - app metadata and UI constants
 
 ## Setup
 
@@ -27,18 +36,10 @@ TAVILY_API_KEY=<your_key>
 MISTRAL_API_KEY=<your_key>
 ```
 
-## Run
-
-```bash
-python pipeline.py
-```
-
-You'll be prompted to enter a research topic. The final revised report is printed at the end.
-
 ## Stack
 
-- [LangChain](https://github.com/langchain-ai/langchain) — agent and chain orchestration
-- [LangGraph](https://github.com/langchain-ai/langgraph) — agent execution via `create_agent`
-- [Mistral AI](https://mistral.ai/) — LLM (`mistral-small`)
-- [Tavily](https://tavily.com/) — web search API
-- [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) — web scraping
+- LangChain for agent and chain orchestration
+- LangGraph for agent execution via `create_agent`
+- Mistral AI for the language model
+- Tavily for web search
+- BeautifulSoup4 for web scraping

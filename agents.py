@@ -12,7 +12,7 @@ from tools import web_search, scrape_url
 
 # using mistral-small — fast and good enough for research tasks
 llm = ChatMistralAI(
-    model="mistral-small",
+    name="mistral-small",
     temperature=0.2
 )
 
@@ -26,11 +26,7 @@ def build_search_agent():
 def build_scrape_agent():
     return create_agent(model=llm, tools=[scrape_url])
 
-
-# -----------------------------------------------------------
 # Writer: turns raw research into a structured report
-# -----------------------------------------------------------
-
 writer_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
@@ -109,11 +105,7 @@ IMPORTANT:
 
 writer_chain = writer_prompt | llm | parser
 
-
-# -----------------------------------------------------------
 # Critic: reviews the report and gives structured feedback
-# -----------------------------------------------------------
-
 critic_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
@@ -206,11 +198,7 @@ Explain the verdict briefly."""
 
 critic_chain = critic_prompt | llm | parser
 
-
-# -----------------------------------------------------------
 # Revision: rewrites the report based on critic feedback
-# -----------------------------------------------------------
-
 revision_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
