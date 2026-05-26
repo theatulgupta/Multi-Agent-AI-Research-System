@@ -71,18 +71,9 @@ def main() -> None:
         done_up = len(STEPS)
 
     with right_col:
-        st.markdown(
-            """
-            <div class="section-card">
-                <div class="section-title">Live Research Process</div>
-                <p class="section-subtitle">Watch the pipeline move through each stage. Active steps glow green, completed steps stay visible, and errors are clearly marked.</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown("<div style='height:0.75rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
         pipeline_ph = st.empty()
-        st.markdown("<div style='height:0.75rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
         stage_note_ph = st.empty()
         render_pipeline(active, done_up, error_at=st.session_state.active_step if st.session_state.error else -1, target=pipeline_ph)
         render_process_note(

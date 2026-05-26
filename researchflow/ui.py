@@ -9,81 +9,88 @@ from .service import score_color
 
 
 def render_pipeline(active: int, done_up_to: int, error_at: int = -1, target=None) -> None:
-    """Render the pipeline with proper HTML (v2 - fixed)."""
-    cards = []
+    """Render a clean horizontal pipeline with checkpoints."""
+    
+    # Calculate progress percentage
+    total_steps = len(STEPS)
+    progress_pct = (done_up_to / total_steps) * 100 if done_up_to > 0 else 0
+    
+    # Build checkpoint circles
+    checkpoints = []
     for i, (label, desc) in enumerate(STEPS):
+        # Determine state
         if error_at == i:
-            tone = "#ef4444"
-            status = "Error"
-            line = "Failed"
-            symbol = "✕"
+            state_color = "#ef4444"
+            state_icon = "✕"
+            state_class = "error"
         elif i < done_up_to:
-            tone = "#22c55e"
-            status = "Complete"
-            line = "Finished"
-            symbol = "✓"
+            state_color = "#22c55e"
+            state_icon = "✓"
+            state_class = "done"
         elif i == active:
-            tone = "#22c55e"
-            status = "Active"
-            line = "Running"
-            symbol = "●"
+            state_color = "#22c55e"
+            state_icon = "●"
+            state_class = "active"
         else:
-            tone = "#1f2937"
-            status = "Waiting"
-            line = "Pending"
-            symbol = "○"
-
-        connector = ""
-        if i < len(STEPS) - 1:
-            connector = f'<div style="width:2px;height:22px;background:{"rgba(34,197,94,0.7)" if i < done_up_to else "rgba(75,85,99,0.7)"};margin:0 auto;border-radius:999px;"></div>'
-
-        cards.append(
-            f"""
-            <div style="display:grid;grid-template-columns:64px 1fr;gap:1rem;align-items:stretch;">
-                <div style="display:flex;flex-direction:column;align-items:center;">
-                    <div style="width:52px;height:52px;border-radius:16px;border:1px solid {tone};background:rgba(5,7,11,0.96);display:flex;align-items:center;justify-content:center;color:{tone};font-size:1.1rem;font-weight:800;box-shadow:0 0 0 1px rgba(255,255,255,0.02) inset;">{symbol}</div>
-                    {connector}
-                </div>
-                <div style="background:#0b1118;border:1px solid {tone}40;border-radius:18px;padding:1rem 1.05rem;min-height:118px;box-shadow:0 10px 30px rgba(0,0,0,0.18);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:0.8rem;margin-bottom:0.75rem;">
-                        <div style="font-size:0.72rem;color:{tone};font-weight:800;text-transform:uppercase;letter-spacing:0.08em;">{status}</div>
-                        <div style="font-size:0.72rem;color:#94a3b8;font-weight:700;">{line}</div>
-                    </div>
-                    <div style="font-size:1.08rem;font-weight:800;color:#f8fafc;margin-bottom:0.35rem;">{label}</div>
-                    <div style="font-size:0.84rem;line-height:1.6;color:#9aa9b8;">{desc}</div>
-                </div>
+            state_color = "#4b5563"
+            state_icon = "○"
+            state_class = "idle"
+        
+        # Position on the line (evenly distributed)
+        position_pct = (i / (total_steps - 1)) * 100 if total_steps > 1 else 50
+        
+        checkpoints.append(f'''
+        <div style="position:absolute;left:{position_pct}%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;z-index:2;">
+            <div style="width:40px;height:40px;border-radius:50%;background:{state_color}22;border:2px solid {state_color};display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:{state_color};font-weight:700;box-shadow:0 0 20px {state_color}40;">{state_icon}</div>
+            <div style="font-size:0.7rem;font-weight:600;color:{state_color};white-space:nowrap;">{label}</div>
+        </div>
+        ''')
+    
+    html_content = f'''
+    <div style="background:rgba(10,14,20,0.6);border:1px solid rgba(34,197,94,0.15);border-radius:16px;padding:2rem 1.5rem;margin:1rem 0;">
+        <div style="margin-bottom:1.5rem;">
+            <div style="font-size:0.85rem;font-weight:700;color:#e5e7eb;margin-bottom:0.3rem;">Research Pipeline</div>
+            <div style="font-size:0.75rem;color:#9ca3af;">Live progress through evidence collection and synthesis</div>
+        </div>
+        
+        <div style="position:relative;height:80px;margin:1rem 0;">
+            <!-- Background track -->
+            <div style="position:absolute;top:50%;left:0;right:0;height:3px;background:#1f2937;transform:translateY(-50%);border-radius:999px;"></div>
+            
+            <!-- Progress fill -->
+            <div style="position:absolute;top:50%;left:0;width:{progress_pct}%;height:3px;background:linear-gradient(90deg,#22c55e,#86efac);transform:translateY(-50%);border-radius:999px;transition:width 0.5s ease;"></div>
+            
+            <!-- Checkpoints -->
+            {''.join(checkpoints)}
+        </div>
+        
+        <div style="margin-top:1.5rem;padding:0.8rem 1rem;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;">
+            <div style="font-size:0.75rem;color:#86efac;font-weight:600;">
+                {STEPS[active][1] if 0 <= active < len(STEPS) else "Ready to start"}
             </div>
-            """
-        )
-
-    content = f"""
-    <div class="section-card">
-        <div class="section-title">Evidence Pipeline</div>
-        <p class="section-subtitle">Live pipeline: source discovery, extraction, synthesis, review, revision.</p>
+        </div>
     </div>
-    <div style="height:0.85rem"></div>
-    <div style="display:flex;flex-direction:column;gap:0.95rem;">{''.join(cards)}</div>
-    """
-
+    '''
+    
     if target is not None:
-        target.markdown(content, unsafe_allow_html=True)
+        target.markdown(html_content, unsafe_allow_html=True)
     else:
-        st.markdown(content, unsafe_allow_html=True)
+        st.markdown(html_content, unsafe_allow_html=True)
 
 
 def render_hero() -> None:
     st.markdown(
         f"""
-        <div class="hero">
-            <div class="hero-grid">
+        <div style="background:linear-gradient(135deg,rgba(8,10,15,0.96),rgba(7,14,10,0.94));border:1px solid rgba(34,197,94,0.2);border-radius:20px;padding:1.8rem 2rem;margin-bottom:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:1.5rem;flex-wrap:wrap;">
                 <div>
-                    <div class="hero-title">{APP_NAME}</div>
-                    <p class="hero-sub">{APP_TAGLINE} <span style="color:#22c55e;font-size:0.7rem;">[UI v2.0 - HTML FIX APPLIED]</span></p>
+                    <div style="font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#ecfdf5,#22c55e,#86efac);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:0;">{APP_NAME}</div>
+                    <p style="margin:0.4rem 0 0;color:#9ca3af;font-size:0.95rem;">{APP_TAGLINE}</p>
                 </div>
-                <div class="hero-badges">
-                    <span class="hero-badge">Professional research workspace</span>
-                    <span class="hero-badge">Live evidence flow</span>
-                    <span class="hero-badge">Source-aware review</span>
+                <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+                    <span style="padding:0.4rem 0.9rem;border-radius:999px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.1);color:#86efac;font-size:0.75rem;font-weight:600;">Live Pipeline</span>
+                    <span style="padding:0.4rem 0.9rem;border-radius:999px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.1);color:#86efac;font-size:0.75rem;font-weight:600;">Source-Aware</span>
+                    <span style="padding:0.4rem 0.9rem;border-radius:999px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.1);color:#86efac;font-size:0.75rem;font-weight:600;">Auto-Review</span>
                 </div>
             </div>
         </div>
@@ -101,9 +108,9 @@ def render_sidebar() -> None:
 def render_workspace_intro() -> None:
     st.markdown(
         """
-        <div class="section-card">
-            <div class="section-title">Topic briefing</div>
-            <p class="section-subtitle">Enter a topic and the system will search, scrape, write, review, and revise while showing each stage live.</p>
+        <div style="background:rgba(10,14,20,0.6);border:1px solid rgba(34,197,94,0.15);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
+            <div style="font-size:0.85rem;font-weight:700;color:#e5e7eb;margin-bottom:0.3rem;">Topic Briefing</div>
+            <p style="margin:0;color:#9ca3af;font-size:0.8rem;line-height:1.5;">Enter a research topic below. The system will search, scrape, write, review, and revise while showing live progress.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -112,14 +119,9 @@ def render_workspace_intro() -> None:
 
 def render_process_note(current_stage: str, target=None) -> None:
     content = f"""
-        <div class="section-card">
-            <div class="section-title">Current stage</div>
-            <p class="section-subtitle">{escape(current_stage)}</p>
-            <div class="research-meta">
-                <span class="meta-chip">Sources first</span>
-                <span class="meta-chip">Draft from evidence</span>
-                <span class="meta-chip">Critique before finalizing</span>
-            </div>
+        <div style="background:rgba(10,14,20,0.6);border:1px solid rgba(34,197,94,0.15);border-radius:14px;padding:1rem 1.2rem;margin-top:1rem;">
+            <div style="font-size:0.85rem;font-weight:700;color:#e5e7eb;margin-bottom:0.3rem;">Current Stage</div>
+            <p style="margin:0;color:#86efac;font-size:0.8rem;line-height:1.5;">{escape(current_stage)}</p>
         </div>
         """
 
