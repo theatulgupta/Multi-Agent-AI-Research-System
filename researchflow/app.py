@@ -60,10 +60,6 @@ def main() -> None:
         st.markdown("<div style='height:0.85rem'></div>", unsafe_allow_html=True)
         topic = render_input_row()
         run_clicked = render_action_button(disabled=st.session_state.running)
-        st.markdown(
-            "<div class='workflow-note'>This interface is designed like a research desk: the left side is for the topic brief, and the right side shows the pipeline as it advances through evidence collection and synthesis.</div>",
-            unsafe_allow_html=True,
-        )
 
     active = st.session_state.active_step if st.session_state.running else -1
     done_up = st.session_state.active_step if st.session_state.done else (st.session_state.active_step if not st.session_state.running else 0)
@@ -73,13 +69,7 @@ def main() -> None:
     with right_col:
         st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
         pipeline_ph = st.empty()
-        st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
-        stage_note_ph = st.empty()
         render_pipeline(active, done_up, error_at=st.session_state.active_step if st.session_state.error else -1, target=pipeline_ph)
-        render_process_note(
-            STAGE_GUIDES[st.session_state.active_step] if st.session_state.running and st.session_state.active_step < len(STAGE_GUIDES) else "Ready to start. The pipeline will expose every stage as it runs.",
-            target=stage_note_ph,
-        )
 
     if st.session_state.done and st.session_state.state:
         s = st.session_state.state
@@ -119,7 +109,6 @@ def main() -> None:
             done_up_to = step + 1 if state == "done" else step
             active_step = min(step + 1, len(STEPS) - 1) if state == "done" else step
             render_pipeline(active_step, done_up_to, error_at=-1, target=pipeline_ph)
-            render_process_note(message, target=stage_note_ph)
 
         try:
             state = run_research_pipeline(topic, max_results=max_results, scrape_limit=scrape_limit, progress=progress)
