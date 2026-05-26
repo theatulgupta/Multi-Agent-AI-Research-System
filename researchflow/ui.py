@@ -1,3 +1,4 @@
+"""UI components and rendering functions for ResearchFlow."""
 from __future__ import annotations
 
 from html import escape
@@ -9,7 +10,14 @@ from .service import score_color
 
 
 def render_pipeline(active: int, done_up_to: int, error_at: int = -1, target=None) -> None:
-    """Render a clean horizontal pipeline with checkpoints."""
+    """Render a clean horizontal pipeline with checkpoints.
+    
+    Args:
+        active: Index of currently active step
+        done_up_to: Number of completed steps
+        error_at: Index of step with error (-1 if no error)
+        target: Optional Streamlit placeholder to render into
+    """
     
     # Calculate progress percentage
     total_steps = len(STEPS)

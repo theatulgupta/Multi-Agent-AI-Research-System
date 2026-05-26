@@ -1,6 +1,8 @@
+"""Main Streamlit application for ResearchFlow."""
 from __future__ import annotations
 
 import time
+import logging
 
 import streamlit as st
 
@@ -13,13 +15,14 @@ from .ui import (
     render_hero,
     render_input_row,
     render_pipeline,
-    render_process_note,
     render_raw_artifact,
     render_report_shell,
     render_score_pills,
     render_sidebar,
     render_workspace_intro,
 )
+
+logging.basicConfig(level=logging.INFO)
 
 
 def _init_state() -> None:
@@ -111,19 +114,39 @@ def main() -> None:
             render_pipeline(active_step, done_up_to, error_at=-1, target=pipeline_ph)
 
         try:
-            state = run_research_pipeline(topic, max_results=max_results, scrape_limit=scrape_limit, progress=progress)
+            state = run_research_pipeline(
+                topic, 
+                max_results=max_results, 
+                scrape_limit=scrape_limit, 
+                progress=progress
+            )
             st.session_state.state = state
             st.session_state.elapsed = time.time() - start_time
             st.session_state.done = True
             st.session_state.running = False
-            status_ph.markdown('<span class="status-badge badge-done">Completed</span>', unsafe_allow_html=True)
+            status_ph.markdown(
+                '<span class="status-badge badge-done">Completed</span>', 
+                unsafe_allow_html=True
+            )
             progress_ph.progress(100, text="Pipeline complete")
             st.rerun()
+        except ValueError as e:
+            st.session_state.running = False
+            st.session_state.error = True
+            status_ph.markdown(
+                f'<span class="status-badge badge-error">Validation Error</span>', 
+                unsafe_allow_html=True
+            )
+            st.error(f"Invalid input: {e}")
         except Exception as e:
             st.session_state.running = False
             st.session_state.error = True
-            status_ph.markdown(f'<span class="status-badge badge-error">Error: {e}</span>', unsafe_allow_html=True)
+            status_ph.markdown(
+                f'<span class="status-badge badge-error">Error</span>', 
+                unsafe_allow_html=True
+            )
             st.error(f"Pipeline failed at step {st.session_state.active_step + 1}: {e}")
+            logging.error(f"Pipeline error: {e}", exc_info=True)
 
     elif run_clicked and not topic.strip():
         st.warning("Please enter a research topic first.")

@@ -1,6 +1,16 @@
 # ResearchFlow
 
-ResearchFlow is a dark, professional research workspace that searches sources, extracts evidence, drafts a report, reviews it, and publishes a final revision.
+ResearchFlow is a professional AI-powered research workspace that automatically searches sources, extracts evidence, drafts reports, reviews them, and publishes final revisions.
+
+## Features
+
+- 🔍 **Intelligent Web Search** - Finds credible sources using Tavily API
+- 📄 **Smart Content Extraction** - Scrapes and cleans web content
+- ✍️ **AI Report Writing** - Generates structured research reports
+- 🔎 **Automated Review** - Critiques reports for quality and accuracy
+- ♻️ **Iterative Refinement** - Revises reports based on feedback
+- 📊 **Live Progress Tracking** - Visual pipeline with real-time updates
+- 🎨 **Dark Professional UI** - Clean, modern interface
 
 ## Flow
 
@@ -8,41 +18,65 @@ ResearchFlow is a dark, professional research workspace that searches sources, e
 Topic Brief → Search → Scrape → Draft → Review → Revise → Final Report
 ```
 
-## Run
+## Quick Start
 
+### Local Development
+
+1. **Clone the repository**
 ```bash
-streamlit run app.py
+git clone <your-repo-url>
+cd Multi-Agent-System
 ```
 
-## Project Structure
-
-- `app.py` - thin Streamlit entrypoint
-- `researchflow/app.py` - main UI assembly and workflow wiring
-- `researchflow/ui.py` - reusable UI components and process tracker
-- `researchflow/service.py` - pipeline execution and scoring helpers
-- `researchflow/theme.py` - shared dark theme and styling
-- `researchflow/config.py` - app metadata and UI constants
-
-## Setup
-
+2. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-Create a `.env` file with your API keys:
+3. **Set up environment variables**
+
+Create a `.env` file:
+```env
+TAVILY_API_KEY=your_tavily_api_key
+MISTRAL_API_KEY=your_mistral_api_key
+```
+
+4. **Run the app**
+```bash
+streamlit run app.py
+```
+
+### Get API Keys
+
+- **Tavily API**: https://tavily.com (for web search)
+- **Mistral API**: https://console.mistral.ai (for AI models)
+
+## Project Structure
 
 ```
-TAVILY_API_KEY=<your_key>
-MISTRAL_API_KEY=<your_key>
+.
+├── app.py                  # Streamlit entrypoint
+├── agents.py               # Agent and chain definitions
+├── tools.py                # Web search and scraping tools
+├── researchflow/
+│   ├── app.py              # Main UI and workflow
+│   ├── ui.py               # UI components
+│   ├── service.py          # Pipeline execution
+│   ├── theme.py            # Styling and theme
+│   ├── config.py           # App configuration
+│   └── env.py              # Environment helper
+├── requirements.txt        # Python dependencies
+└── DEPLOYMENT.md           # Deployment guide
 ```
 
-## Stack
+## Tech Stack
 
-- LangChain for agent and chain orchestration
-- LangGraph for agent execution via `create_agent`
-- Mistral AI for the language model
-- Tavily for web search
-- BeautifulSoup4 for web scraping
+- **LangChain** - Agent and chain orchestration
+- **LangGraph** - Agent execution framework
+- **Mistral AI** - Language model (mistral-small-latest)
+- **Tavily** - Web search API
+- **BeautifulSoup4** - Web scraping
+- **Streamlit** - Web interface
 
 ## Deployment
 

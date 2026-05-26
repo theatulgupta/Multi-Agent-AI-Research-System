@@ -1,3 +1,4 @@
+"""Agent and chain definitions for research pipeline."""
 from researchflow.env import get_api_key
 import os
 
@@ -12,9 +13,9 @@ from langchain_mistralai import ChatMistralAI
 from tools import web_search, scrape_url
 
 
-# using mistral-small — fast and good enough for research tasks
+# Using mistral-small — fast and good enough for research tasks
 llm = ChatMistralAI(
-    name="mistral-small",
+    model="mistral-small-latest",
     temperature=0.2
 )
 
@@ -22,10 +23,12 @@ parser = StrOutputParser()
 
 
 def build_search_agent():
+    """Build agent for web search operations."""
     return create_agent(model=llm, tools=[web_search])
 
 
 def build_scrape_agent():
+    """Build agent for web scraping operations."""
     return create_agent(model=llm, tools=[scrape_url])
 
 # Writer: turns raw research into a structured report
