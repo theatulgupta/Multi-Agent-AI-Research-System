@@ -1,42 +1,65 @@
 # Streamlit Cloud Deployment Fix
 
-## Problem
-App was failing to deploy on Streamlit Cloud with error:
-```
-/usr/bin/ld: cannot find -lz: No such file or directory
-```
+## Problems Fixed
 
-## Root Cause
-1. **Python 3.14 incompatibility**: lxml 5.3.0 doesn't have prebuilt wheels for Python 3.14
-2. **Missing system dependency**: zlib development package (zlib1g-dev) was not installed
-3. **Build from source failing**: lxml tried to build from source but couldn't find zlib
+### 1. lxml Build Error (SOLVED ✅)
+**Error**: `/usr/bin/ld: cannot find -lz: No such file or directory`
 
-## Solution Applied
+**Root Cause**:
+- Python 3.14 incompatibility with lxml 5.3.0
+- Missing zlib development package
+- lxml trying to build from source
 
-### 1. Created `runtime.txt`
+**Solution**:
+- Created `runtime.txt` with `python-3.11`
+- Added `zlib1g-dev` to `packages.txt`
+- Downgraded lxml to 5.2.2
+
+### 2. ImportError (SOLVED ✅)
+**Error**: `cannot import name 'create_agent' from 'langchain.agents'`
+
+**Root Cause**:
+- `create_agent` was deprecated and removed from `langchain.agents`
+- Moved to `langgraph.prebuilt` in newer versions
+
+**Solution**:
+- Changed import from `langchain.agents.create_agent`
+- To `langgraph.prebuilt.create_react_agent`
+- Updated function calls: `create_agent(model=llm, tools=[...])` → `create_react_agent(llm, [...])`
+
+## Solutions Applied
+
+### Fix 1: Python Version & Dependencies
+
+**Created `runtime.txt`**:
 ```
 python-3.11
 ```
-Forces Streamlit Cloud to use Python 3.11 instead of 3.14 for better stability.
 
-### 2. Updated `packages.txt`
+**Updated `packages.txt`**:
 ```
 libxml2-dev
 libxslt1-dev
 zlib1g-dev  # ADDED THIS
 ```
-Added zlib1g-dev to provide the missing `-lz` linker dependency.
 
-### 3. Downgraded lxml in `requirements.txt`
+**Updated `requirements.txt`**:
 ```
 lxml==5.2.2  # Changed from 5.3.0
 ```
-Version 5.2.2 has better compatibility with both Python 3.11 and 3.12.
 
-### 4. Updated Documentation
-- Added deployment troubleshooting to DEPLOYMENT.md
-- Updated README with deployment notes
-- Documented the importance of each deployment file
+### Fix 2: Import Error
+
+**Updated `agents.py`**:
+```python
+# OLD (deprecated)
+from langchain.agents import create_agent
+return create_agent(model=llm, tools=[web_search])
+
+# NEW (correct)
+from langgraph.prebuilt import create_react_agent
+return create_react_agent(llm, [web_search])
+```
 
 ## Why This Works
 
@@ -55,21 +78,24 @@ Version 5.2.2 has better compatibility with both Python 3.11 and 3.12.
 - More stable than 5.3.0
 - Avoids source compilation
 
-## Testing
-1. Push to GitHub: ✅
-2. Streamlit Cloud will automatically redeploy
-3. Check build logs for success
-4. Test app functionality
+**create_react_agent**:
+- Modern replacement for deprecated create_agent
+- Part of langgraph.prebuilt module
+- Better integration with latest LangChain ecosystem
 
-## Expected Result
-App should now deploy successfully on Streamlit Cloud without build errors.
+## Commits
 
-## Commit
-```
-fix: resolve Streamlit Cloud deployment issues
-- Add runtime.txt to specify Python 3.11 for stability
-- Add zlib1g-dev to packages.txt to fix lxml build error
-- Downgrade lxml from 5.3.0 to 5.2.2 for better compatibility
-```
+1. **Fix lxml and Python version** (86d71c7):
+   ```
+   fix: resolve Streamlit Cloud deployment issues
+   - Add runtime.txt to specify Python 3.11
+   - Add zlib1g-dev to packages.txt
+   - Downgrade lxml from 5.3.0 to 5.2.2
+   ```
 
-Commit hash: 86d71c7
+2. **Fix import error** (bd65751):
+   ```
+   fix: use create_react_agent from langgraph.prebuilt
+   - Replace deprecated create_agent
+   - Fixes ImportError on Streamlit Cloud
+   ```
