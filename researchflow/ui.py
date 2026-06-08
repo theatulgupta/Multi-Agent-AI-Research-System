@@ -11,18 +11,18 @@ from .service import score_color
 
 def render_pipeline(active: int, done_up_to: int, error_at: int = -1, target=None) -> None:
     """Render a clean horizontal pipeline with checkpoints.
-    
+
     Args:
         active: Index of currently active step
         done_up_to: Number of completed steps
         error_at: Index of step with error (-1 if no error)
         target: Optional Streamlit placeholder to render into
     """
-    
+
     # Calculate progress percentage
     total_steps = len(STEPS)
     progress_pct = (done_up_to / total_steps) * 100 if done_up_to > 0 else 0
-    
+
     # Build checkpoint circles
     checkpoints = []
     for i, (label, desc) in enumerate(STEPS):
@@ -43,43 +43,43 @@ def render_pipeline(active: int, done_up_to: int, error_at: int = -1, target=Non
             state_color = "#4b5563"
             state_icon = "○"
             state_class = "idle"
-        
+
         # Position on the line (evenly distributed)
         position_pct = (i / (total_steps - 1)) * 100 if total_steps > 1 else 50
-        
+
         checkpoints.append(f'''
 <div style="position:absolute;left:{position_pct}%;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;z-index:2;">
     <div style="width:36px;height:36px;border-radius:50%;background:{state_color}22;border:2px solid {state_color};display:flex;align-items:center;justify-content:center;font-size:1rem;color:{state_color};font-weight:700;box-shadow:0 0 15px {state_color}30;">{state_icon}</div>
     <div style="font-size:0.7rem;font-weight:600;color:{state_color};white-space:nowrap;margin-top:0.25rem;">{label}</div>
 </div>''')
-    
+
     html_content = f'''
 <div style="background:rgba(10,14,20,0.6);border:1px solid rgba(34,197,94,0.15);border-radius:16px;padding:2rem 1.5rem;margin:1rem 0;">
     <div style="margin-bottom:1.5rem;">
         <div style="font-size:0.85rem;font-weight:700;color:#e5e7eb;margin-bottom:0.3rem;">Research Pipeline</div>
         <div style="font-size:0.75rem;color:#9ca3af;">Live progress through evidence collection and synthesis</div>
     </div>
-    
+
     <div style="position:relative;height:90px;margin:1.5rem 0;padding:0 20px;">
         <div style="position:relative;height:100%;">
             <!-- Background track -->
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#1f2937;border-radius:999px;"></div>
-            
+
             <!-- Progress fill -->
             <div style="position:absolute;top:0;left:0;width:{progress_pct}%;height:3px;background:linear-gradient(90deg,#22c55e,#86efac);border-radius:999px;transition:width 0.5s ease;"></div>
-            
+
             <!-- Checkpoints -->
             {''.join(checkpoints)}
         </div>
     </div>
-    
+
     <div style="margin-top:1.5rem;padding:0.8rem 1rem;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;">
         <div style="font-size:0.75rem;color:#86efac;font-weight:600;">
             {STEPS[active][1] if 0 <= active < len(STEPS) else "Ready to start"}
         </div>
     </div>
 </div>'''
-    
+
     if target is not None:
         target.html(html_content)
     else:
