@@ -5,7 +5,7 @@ import os
 # Set API key for Mistral
 os.environ["MISTRAL_API_KEY"] = get_api_key("MISTRAL_API_KEY")
 
-from langchain.agents import create_agent
+from langgraph.prebuilt import create_react_agent
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_mistralai import ChatMistralAI
@@ -24,12 +24,12 @@ parser = StrOutputParser()
 
 def build_search_agent():
     """Build agent for web search operations."""
-    return create_agent(model=llm, tools=[web_search])
+    return create_react_agent(llm, [web_search])
 
 
 def build_scrape_agent():
     """Build agent for web scraping operations."""
-    return create_agent(model=llm, tools=[scrape_url])
+    return create_react_agent(llm, [scrape_url])
 
 # Writer: turns raw research into a structured report
 writer_prompt = ChatPromptTemplate.from_messages([
