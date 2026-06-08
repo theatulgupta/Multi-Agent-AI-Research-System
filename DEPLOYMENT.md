@@ -21,9 +21,8 @@ git push
 2. Click "New app"
 3. Select your GitHub repository
 4. Set main file path: `app.py`
-5. Click "Advanced settings"
-6. Set Python version: `3.11`
-7. Click "Deploy"
+5. Python version will be automatically set to 3.11 from `runtime.txt`
+6. Click "Deploy"
 
 ### 3. Add Secrets
 
@@ -50,8 +49,18 @@ In app settings, you can configure a custom subdomain like:
 
 ### Build Fails
 - Check logs in Streamlit Cloud dashboard
-- Verify all dependencies in requirements.txt are compatible
-- Ensure Python version is 3.11
+- Ensure `runtime.txt` specifies Python 3.11
+- Verify `packages.txt` includes all system dependencies
+- Ensure all dependencies in requirements.txt are compatible
+
+### lxml Installation Errors
+- Make sure `packages.txt` includes:
+  ```
+  libxml2-dev
+  libxslt1-dev
+  zlib1g-dev
+  ```
+- Using lxml==5.2.2 for better compatibility
 
 ### API Key Errors
 - Verify secrets are added correctly in TOML format

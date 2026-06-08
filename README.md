@@ -85,5 +85,11 @@ Deploy to Streamlit Cloud in minutes. See [DEPLOYMENT.md](DEPLOYMENT.md) for det
 **Quick Deploy:**
 1. Push to GitHub
 2. Connect at https://share.streamlit.io
-3. Add API keys in Secrets settings
-4. Deploy!
+3. Set Python version to 3.11 (automatic with runtime.txt)
+4. Add API keys in Secrets settings
+5. Deploy!
+
+**Important Files for Deployment:**
+- `runtime.txt` - Specifies Python 3.11
+- `packages.txt` - System dependencies (libxml2, libxslt, zlib)
+- `requirements.txt` - Python dependencies (pinned versions)
